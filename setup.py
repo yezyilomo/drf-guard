@@ -19,7 +19,7 @@ def get_readme():
     return readme
 
 def get_info(info_name):
-    init_py = open(os.path.join('django_restql', '__init__.py')).read()
+    init_py = open(os.path.join('drf_guard', '__init__.py')).read()
     return re.search("%s = ['\"]([^'\"]+)['\"]" % info_name, init_py).group(1)
 
 url = get_info('__url__')
