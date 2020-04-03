@@ -1,6 +1,6 @@
 # drf-guard
 
-Flexible and simple to use permissions for Django REST Framework
+Flexible and simple to use permissions for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups.
 
 ## Requirements
 - Python >= 3.5
@@ -43,14 +43,17 @@ class UserViewSet(viewsets.ModelViewSet):
                  'permissions': [IsAuthenticated, And, IsAllowedUser]  # Should be authenticated and allowed
              },
          },
+
          'PUT': {
              'groups': ['__all__'],  # Belongs to any group
              'permissions': [IsAuthenticated, And, IsAdmin]  # By now this should be obvious
          },
+
          'PATCH': {
              'groups': ['client', And, Not, 'admin'],  # User belongs to client and not admin group
              'permissions': [IsAuthenticated, IsAllowedUser]  # This is = [IsAuthenticated, And, IsAllowedUser]
          },
+         
          'DELETE': {
              'groups': ['client', Or, [Not, 'client', And, 'admin']],  # You can basically do any combination
              'permissions': [IsAuthenticated]
