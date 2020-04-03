@@ -64,8 +64,8 @@ What's important here is to know what goes into groups and permission
 - Groups takes group names and Django group objects, so you can use those operators however you want with these two
 - Permissions takes DRF permissions(class based), Django permission objects and Django permission names, so you can use those operators however you want with these three
 
-Note:
-- And, Or & Not are the equvalent operators for and, or & not 
+### Note:
+- `And`, `Or` & `Not` are the equvalent operators for `and`, `or` & `not` respectively 
 - The '__all__' on groups stands for any group(or allow all groups)
 - The GET-list stands for permission & groups in `GET: /user/` route
 - The GET-retrieve stands for groups & permissions in `GET: /user/{id}/` routes
