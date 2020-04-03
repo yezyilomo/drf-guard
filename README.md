@@ -2,16 +2,26 @@
 
 Flexible and simple to use permissions for Django REST Framework
 
-## Getting started
+## Requirements
+- Python >= 3.5
+- Django >= 1.11
+- Django REST Framework >= 3.5
 
+## Installing
+Coming soon!..
+```py
+pip install drf-guard
+```
+
+## Getting started
+Using `drf-guard` is very simple, below is an example
 ```py
 # views.py
-
-from rest_framework import viewsets
 
 # Import operators & permissions from drf_guard
 from drf_guard.operators import And, Or, Not
 from drf_guard.permissions import HasRequiredGroups, HasRequiredPermissions
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -20,7 +30,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # Use drf_guard permissions here
     permission_classes = (HasRequiredGroups, HasRequiredPermissions)
     
-    # Now guard your API as you wish
+    # Now guard your API with groups and permissions as you wish
     groups_and_permissions = {
          'GET': {
              'list': {
@@ -29,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
                  'permissions': [IsAuthenticated]  # Also the user should be authenticated
              },
              'retrieve': {
-                 'groups': [Not 'admin'],  # The user should not be in admin group
+                 'groups': [Not, 'admin'],  # The user should not be in admin group
                  'permissions': [IsAuthenticated, And, IsAllowedUser]  # Should be authenticated and allowed
              },
          },
@@ -38,11 +48,11 @@ class UserViewSet(viewsets.ModelViewSet):
              'permissions': [IsAuthenticated, And, IsAdmin]  # By now this should be obvious
          },
          'PATCH': {
-             'groups': ['client', And, Not 'admin'],  # User belongs to client and not admin group
+             'groups': ['client', And, Not, 'admin'],  # User belongs to client and not admin group
              'permissions': [IsAuthenticated, IsAllowedUser]  # This is = [IsAuthenticated, And, IsAllowedUser]
          },
          'DELETE': {
-             'groups': ['client', Or, [Not 'client', And, 'admin']],  # You can basically do any combination
+             'groups': ['client', Or, [Not, 'client', And, 'admin']],  # You can basically do any combination
              'permissions': [IsAuthenticated]
          }
     }
