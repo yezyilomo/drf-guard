@@ -8,7 +8,6 @@ Flexible and simple to use permissions for Django REST Framework(DRF). Works wit
 - Django REST Framework >= 3.5
 
 ## Installing
-Coming soon!..
 ```py
 pip install drf-guard
 ```
