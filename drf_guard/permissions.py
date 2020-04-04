@@ -104,7 +104,8 @@ class HasRequiredPermissions(permissions.BasePermission):
             # Encountered an operator
             return permission()
         else:
-            raise TypeError(f"`{type(permission).__name__}` is invalid permission type.")
+            data_type = type(permission).__name__
+            raise TypeError("`%s` is invalid permission type." % data_type)
 
     @staticmethod
     def get_permissions(request, view):
