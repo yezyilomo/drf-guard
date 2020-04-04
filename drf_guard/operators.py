@@ -3,7 +3,7 @@ from functools import reduce
 
 class Operator():
     @property
-    def is_complete(self):
+    def has_operands(self):
         return hasattr(self, 'left_operand') and hasattr(self, 'right_operand')
 
 
@@ -19,7 +19,7 @@ class And(Operator):
 
 class Not(Operator):
     @property
-    def is_complete(self):
+    def has_operands(self):
         return hasattr(self, 'right_operand')
         
     def eval(self):
@@ -47,13 +47,13 @@ class Reducer():
             
         if isinstance(left_operand, Operator):
             left_operand.right_operand = right_operand
-            if left_operand.is_complete:
+            if left_operand.has_operands:
                 return left_operand.eval()
             return left_operand
             
         if isinstance(right_operand, Operator):
             right_operand.left_operand = left_operand
-            if right_operand.is_complete:
+            if right_operand.has_operands:
                 return right_operand.eval()
             return right_operand
             
