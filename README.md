@@ -67,11 +67,11 @@ What's important here is to know what goes into groups and permission
 ### Note:
 - `And`, `Or` & `Not` are the equvalent operators for `and`, `or` & `not` respectively 
 - Unlike `and`, `or` & `not` the operators `And`, `Or` & `Not` have no precedence they are evaluated from left to right, if you want precedence use list or tuple to make one i.e `[IsAuthenticated, And, [IsAdmin, Or, IsClient]]`
-- The '__all__' on groups stands for any group(or allow all groups)
-- The GET-list stands for permission & groups in `GET: /user/` route
-- The GET-retrieve stands for groups & permissions in `GET: /user/{id}/` routes
-- The POST stands for groups & permissions in `POST: /user/` route
-- The PUT stands for groups & permissions in `PUT: /user/{id}/` routes
-- The PATCH stands for groups & permissions in `PATCH: /user/{id}/` routes
-- The DELETE stands for groups & permissions in `DELETE: /user/{id}/` routes
+- The `'__all__'` on groups stands for any group(or allow all groups)
+- The GET-list stands for permission & groups in `GET: /users/` route
+- The GET-retrieve stands for groups & permissions in `GET: /users/{id}/` routes
+- The POST stands for groups & permissions in `POST: /users/` route
+- The PUT stands for groups & permissions in `PUT: /users/{id}/` routes
+- The PATCH stands for groups & permissions in `PATCH: /users/{id}/` routes
+- The DELETE stands for groups & permissions in `DELETE: /users/{id}/` routes
 
