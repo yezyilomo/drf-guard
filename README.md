@@ -33,13 +33,13 @@ class UserViewSet(viewsets.ModelViewSet):
     groups_and_permissions = {
          'GET': {
              'list': {
-                 # To access this the user should belongs to admin or client group
+                 # To access this the user must belongs to admin or client group
                  'groups': ['admin', Or, 'client'],
-                 'permissions': [IsAuthenticated]  # Also the user should be authenticated
+                 'permissions': [IsAuthenticated]  # Also the user must be authenticated
              },
              'retrieve': {
-                 'groups': [Not, 'admin'],  # The user should not be in admin group
-                 'permissions': [IsAuthenticated, And, IsAllowedUser]  # Should be authenticated and allowed
+                 'groups': [Not, 'admin'],  # The user must not be in admin group
+                 'permissions': [IsAuthenticated, And, IsAllowedUser]  # MUst be authenticated and allowed
              },
          },
 
@@ -61,17 +61,24 @@ class UserViewSet(viewsets.ModelViewSet):
 ```
 
 What's important here is to know what goes into groups and permission
-- Groups takes group names and Django group objects, so you can use those operators however you want with these two
-- Permissions takes DRF permissions(class based), Django permission objects and Django permission names, so you can use those operators however you want with these three
+- Groups takes group names and Django group objects, so you can use those operators however you want with these two, you can even mix the two types together, e.g
+```py
+'groups': [Group.objects.get(name='admin'), Or, 'client']
+```
+
+- Permissions takes DRF permissions(class based), Django permission objects and Django permission names(codenames), so you can use those operators however you want with these three, you can even use all three types together, e.g
+```py
+'permissions': [IsAuthenticated, And, Permissions.objects.get('view_user'), Or, 'change_user']
+```
 
 ### Note:
 - `And`, `Or` & `Not` are the equvalent operators for `and`, `or` & `not` respectively 
 - Unlike `and`, `or` & `not` the operators `And`, `Or` & `Not` have no precedence they are evaluated from left to right, if you want precedence use list or tuple to make one i.e `[IsAuthenticated, And, [IsAdmin, Or, IsClient]]`
-- The '__all__' on groups stands for any group(or allow all groups)
-- The GET-list stands for permission & groups in `GET: /user/` route
-- The GET-retrieve stands for groups & permissions in `GET: /user/{id}/` routes
-- The POST stands for groups & permissions in `POST: /user/` route
-- The PUT stands for groups & permissions in `PUT: /user/{id}/` routes
-- The PATCH stands for groups & permissions in `PATCH: /user/{id}/` routes
-- The DELETE stands for groups & permissions in `DELETE: /user/{id}/` routes
+- The `'__all__'` on groups stands for any group(or allow all groups)
+- The GET-list stands for permission & groups in `GET: /users/` route
+- The GET-retrieve stands for groups & permissions in `GET: /users/{id}/` routes
+- The POST stands for groups & permissions in `POST: /users/` route
+- The PUT stands for groups & permissions in `PUT: /users/{id}/` routes
+- The PATCH stands for groups & permissions in `PATCH: /users/{id}/` routes
+- The DELETE stands for groups & permissions in `DELETE: /users/{id}/` routes
 
