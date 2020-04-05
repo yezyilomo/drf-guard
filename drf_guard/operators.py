@@ -3,23 +3,37 @@ from functools import reduce
 
 class Operator():
     @property
-    def has_operands(self):
+    def should_eval(self):
         return hasattr(self, 'left_operand') and hasattr(self, 'right_operand')
 
 
 class Or(Operator):
+    @property
+    def should_eval(self):
+        if getattr(self, 'left_operand', False):
+            # Shortcircuit
+            raise StopIteration(self.left_operand)
+        return super().should_eval
+
     def eval(self):
         return self.left_operand or self.right_operand
 
 
 class And(Operator):
+    @property
+    def should_eval(self):
+        if not getattr(self, 'left_operand', True):
+            # Shortcircuit
+            raise StopIteration(self.left_operand)
+        return super().should_eval
+
     def eval(self):
         return self.left_operand and self.right_operand
 
 
 class Not(Operator):
     @property
-    def has_operands(self):
+    def should_eval(self):
         return hasattr(self, 'right_operand')
         
     def eval(self):
@@ -47,18 +61,22 @@ class Reducer():
             
         if isinstance(left_operand, Operator):
             left_operand.right_operand = right_operand
-            if left_operand.has_operands:
+            if left_operand.should_eval:
                 return left_operand.eval()
             return left_operand
             
         if isinstance(right_operand, Operator):
             right_operand.left_operand = left_operand
-            if right_operand.has_operands:
+            if right_operand.should_eval:
                 return right_operand.eval()
             return right_operand
             
         return left_operand and right_operand # Default operator for ','
     
     def eval(self, sequence):
-        return reduce(self.reducer, sequence)
+        try:
+            return reduce(self.reducer, sequence)
+        except StopIteration as e:
+            # Return value due to shortcircuit
+            return e.args[0]
 
