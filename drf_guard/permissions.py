@@ -76,18 +76,6 @@ class HasRequiredPermissions(permissions.BasePermission):
     Ensure user is has required permissions.
     """
     @classmethod
-    def has_required_permissions(cls, permissions, *args):
-        if permissions is None:
-            # Don't check the permissions
-            return True
-
-        reducer = Reducer()
-        return reducer([
-            cls.has_required_permission(permission, *args)
-            for permission in permissions
-        ])
-
-    @classmethod
     def has_required_permission(cls, permission, request, view, obj=None):
         if isinstance(permission, str):
             return request.user.has_perm(permission)
@@ -107,6 +95,18 @@ class HasRequiredPermissions(permissions.BasePermission):
             data_type = type(permission).__name__
             raise TypeError("`%s` is invalid permission type." % data_type)
 
+    @classmethod
+    def has_required_permissions(cls, permissions, *args):
+        if permissions is None:
+            # Don't check the permissions
+            return True
+
+        reducer = Reducer()
+        return reducer([
+            cls.has_required_permission(permission, *args)
+            for permission in permissions
+        ])
+        
     @staticmethod
     def get_permissions(request, view):
         # Get a mapping of methods -> required group.
