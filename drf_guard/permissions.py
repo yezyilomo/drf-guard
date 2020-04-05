@@ -27,7 +27,7 @@ class HasRequiredGroups(permissions.BasePermission):
             
         reducer = Reducer()
         return reducer(
-                [cls.is_in_group(user, group) for group in groups]
+                (cls.is_in_group(user, group) for group in groups)
             )
 
     def has_permission(self, request, view):
@@ -102,10 +102,10 @@ class HasRequiredPermissions(permissions.BasePermission):
             return True
 
         reducer = Reducer()
-        return reducer([
+        return reducer((
             cls.has_required_permission(permission, *args)
             for permission in permissions
-        ])
+        ))
         
     @staticmethod
     def get_permissions(request, view):

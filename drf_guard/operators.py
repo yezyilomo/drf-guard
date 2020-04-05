@@ -53,11 +53,11 @@ class Reducer():
             right_operand.left_operand = left_operand
             return right_operand
             
-        if isinstance(right_operand, (list, tuple)):
-            right_operand = reduce(self.reducer, right_operand)
-            
         if isinstance(left_operand, (list, tuple)):
             left_operand = reduce(self.reducer, left_operand)
+
+        if isinstance(right_operand, (list, tuple)):
+            right_operand = reduce(self.reducer, right_operand)
             
         if isinstance(left_operand, Operator):
             left_operand.right_operand = right_operand
@@ -71,7 +71,7 @@ class Reducer():
                 return right_operand.eval()
             return right_operand
             
-        return left_operand and right_operand # Default operator for ','
+        return left_operand and right_operand # Default operator for ',' is `And`
     
     def eval(self, sequence):
         try:
