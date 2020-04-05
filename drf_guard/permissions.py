@@ -73,37 +73,39 @@ class HasRequiredGroups(permissions.BasePermission):
 
 class HasRequiredPermissions(permissions.BasePermission):
     """
-    Ensure user is in required groups.
+    Ensure user is has required permissions.
     """
     @classmethod
-    def eval_permission(cls, permission, request, view):
-        if isinstance(permission, str):
-            return request.user.has_perm(permission)
-        elif isinstance(permission, (list, tuple)):
-            return cls.eval_permission(permission, request, view)
-        elif isinstance(permission, Permission):
-            return request.user.has_perm(permission.codename)
-        elif issubclass(permission, permissions.BasePermission):
-            return permission().has_permission(request, view)
-        elif issubclass(permission, Operator):
-            return permission()
-        else:
-            raise TypeError(f"`{type(permission).__name__}` is invalid permission type.")
+    def has_required_permissions(cls, permissions, *args):
+        if permissions is None:
+            # Don't check the permissions
+            return True
+
+        reducer = Reducer()
+        return reducer([
+            cls.has_required_permission(permission, *args)
+            for permission in permissions
+        ])
 
     @classmethod
-    def eval_obj_permission(cls, permission, request, view, obj):
+    def has_required_permission(cls, permission, request, view, obj=None):
         if isinstance(permission, str):
             return request.user.has_perm(permission)
         elif isinstance(permission, (list, tuple)):
-            return cls.eval_obj_permission(permission, request, view, obj)
+            return cls.has_required_permissions(permission, request, view, obj)
         elif isinstance(permission, Permission):
             return request.user.has_perm(permission.codename)
         elif issubclass(permission, permissions.BasePermission):
-            return permission().has_object_permission(request, view, obj)
+            if obj is None:
+                return permission().has_permission(request, view)
+            else:
+                return permission().has_object_permission(request, view, obj)
         elif issubclass(permission, Operator):
+            # Encountered an operator
             return permission()
         else:
-            raise TypeError(f"`{type(permission).__name__}` is invalid permission type.")
+            data_type = type(permission).__name__
+            raise TypeError("`%s` is invalid permission type." % data_type)
 
     @staticmethod
     def get_permissions(request, view):
@@ -118,30 +120,12 @@ class HasRequiredPermissions(permissions.BasePermission):
         elif view.action == 'list':
             required_permissions = required_permissions.get('list', {'groups': None, 'permissions': None})
 
-        required_permissions = required_permissions.get('permissions', None)
-
-        return required_permissions
+        return required_permissions.get('permissions', None)
 
     def has_permission(self, request, view):
         required_permissions = self.get_permissions(request, view)
-        if required_permissions is None:
-            # Don't check the permissions
-            return True
-
-        reducer = Reducer()
-        return reducer([
-            self.eval_permission(permission, request, view) 
-            for permission in required_permissions
-        ])
+        return self.has_required_permissions(required_permissions, request, view)
 
     def has_object_permission(self, request, view, obj):
         required_permissions = self.get_permissions(request, view)
-        if required_permissions is None:
-            # Don't check the permissions
-            return True
-
-        reducer = Reducer()
-        return reducer([
-            self.eval_obj_permission(obj_permission, request, view, obj)
-            for obj_permission in required_permissions
-        ])
+        return self.has_required_permissions(required_permissions, request, view, obj)

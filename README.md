@@ -66,6 +66,7 @@ What's important here is to know what goes into groups and permission
 
 ### Note:
 - `And`, `Or` & `Not` are the equvalent operators for `and`, `or` & `not` respectively 
+- Unlike `and`, `or` & `not` the operators `And`, `Or` & `Not` have no precedence they are evaluated from left to right, if you want precedence use list or tuple to make one i.e `[IsAuthenticated, And, [IsAdmin, Or, IsClient]]`
 - The '__all__' on groups stands for any group(or allow all groups)
 - The GET-list stands for permission & groups in `GET: /user/` route
 - The GET-retrieve stands for groups & permissions in `GET: /user/{id}/` routes
