@@ -60,7 +60,7 @@ class UserViewSet(viewsets.ModelViewSet):
     }
 ```
 
-What's important here is to know what goes into groups and permission
+What's important here is to know what goes into groups and permissions
 - Groups takes group names and Django group objects, so you can use those operators however you want with these two, you can even mix the two types together, e.g
 ```py
 'groups': [Group.objects.get(name='admin'), Or, 'client']
