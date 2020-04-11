@@ -1,8 +1,8 @@
 # drf-guard
 
-Flexible and simple to use permissions for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups. 
+Flexible and simple to use access rules for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups. This library allows you to build complex access rules in a very simple way, it allows you to combine permissions and groups with logical operators.
 
-Have you ever wanted to be able to do something like
+Have you ever had multiple permissions or groups and wanted to be able to do something like below to your endpoint?.
 ```py
 # Check if user has certain permissions with `and`, `or` & `not` operators
 permissions: (IsAdmin Or (IsObjectOwner And IsAllowedToEdit))
@@ -15,7 +15,7 @@ Or
 groups: ('admin' Or 'client' And Not 'seller')
 ```
 
-Well you are not alone, this library allows you to evaluate permissions and groups with `And`, `Or` & `Not` operators to each endpoint however you want regardless whether they are class based DRF permissions, Django permissions or Django grops.
+Well you are not alone, this library allows you to do that with `And`, `Or` & `Not` operators to each endpoint however you want regardless whether you are using class based DRF permissions, Django permissions or Django grops, it can deal with all those.
 
 ## Requirements
 - Python >= 3.5
