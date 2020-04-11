@@ -1,6 +1,6 @@
 # drf-guard
 
-Flexible and simple to use access rules for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups. This library allows you to build complex access rules in a very simple way, it allows you to combine permissions and groups with logical operators.
+Create flexible and simple to use access rules for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups. This library allows you to build complex access rules in a very simple way, it allows you to combine permissions and groups with logical operators.
 
 Have you ever had multiple permissions or groups and wanted to be able to do something like below to your endpoint?.
 ```py
@@ -44,7 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # Use drf_guard permissions here
     permission_classes = (HasRequiredGroups, HasRequiredPermissions)
     
-    # Now guard your API with groups and permissions as you wish
+    # Now guard your API endpoint with groups and permissions as you wish
     groups_and_permissions = {
          'GET': {
              'list': {
