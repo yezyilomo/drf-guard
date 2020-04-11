@@ -1,6 +1,21 @@
 # drf-guard
 
-Flexible and simple to use permissions for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups.
+Flexible and simple to use permissions for Django REST Framework(DRF). Works with both class based DRF permissions, Django permissions and Django groups. 
+
+Have you ever wanted to be able to do something like
+```py
+# Check if user has certain permissions with `and`, `or` & `not` operators
+permissions: (IsAdmin Or (IsObjectOwner And IsAllowedToEdit))
+```
+
+Or
+
+```py
+# Evaluate if user in certain groups with `and`, `or` & `not` operators
+groups: ('admin' Or 'client' And Not 'seller')
+```
+
+Well you are not alone, this library allows you to evaluate permissions and groups with `And`, `Or` & `Not` operators to each endpoint however you want regardless whether they are class based DRF permissions, Django permissions or Django grops.
 
 ## Requirements
 - Python >= 3.5
@@ -81,4 +96,3 @@ What's important here is to know what goes into groups and permissions
 - The PUT stands for groups & permissions in `PUT: /users/{id}/` routes
 - The PATCH stands for groups & permissions in `PATCH: /users/{id}/` routes
 - The DELETE stands for groups & permissions in `DELETE: /users/{id}/` routes
-
