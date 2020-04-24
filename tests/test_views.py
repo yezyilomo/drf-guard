@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from rest_framework.test import APITestCase, APIClient
+from rest_framework.test import APITestCase
 from django.contrib.auth.models import Group
 from tests.testapp.models import User
 
