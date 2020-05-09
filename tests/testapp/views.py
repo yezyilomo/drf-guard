@@ -15,7 +15,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = (HasRequiredGroups, HasRequiredPermissions)
     http_method_names = ['get', 'put', 'patch', 'delete']
-    groups_and_permissions = {
+    access_rules = {
          'GET': {
              'list': {
                  'groups': ['admin'],
