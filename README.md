@@ -44,8 +44,8 @@ class UserViewSet(viewsets.ModelViewSet):
     # Use drf_guard permissions here
     permission_classes = (HasRequiredGroups, HasRequiredPermissions)
     
-    # Now guard your API endpoint with groups and permissions as you wish
-    groups_and_permissions = {
+    # Now define access rules for your API endpoint with groups and permissions as you wish
+    access_rules = {
          'GET': {
              'list': {
                  # To access this the user must belongs to admin or client group

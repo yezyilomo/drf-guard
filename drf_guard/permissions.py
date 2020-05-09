@@ -35,17 +35,19 @@ class HasRequiredGroups(permissions.BasePermission):
             # Separate retrive URL(This will be handled in has_object_permission)
             return True
 
-        # Get a mapping of methods -> required group.
-        required_groups_mapping = getattr(view, "groups_and_permissions", {})
+        # Get a mapping of methods -> access_rules
+        access_rules = getattr(view, "access_rules", {})
 
-        # Determine the required groups for this particular request method.
-        required_groups = required_groups_mapping.get(request.method, {})
+        # Get access rules for this particular request method.
+        http_method_access_rules = access_rules.get(request.method, {})
 
         if view.action == 'list':
-            # Get required groups for list action
-            required_groups = required_groups.get('list', {'groups': None, 'permissions': None})
+            # Get required access rules for list action
+            http_method_access_rules = http_method_access_rules.get(
+                view.action, {'groups': None, 'permissions': None}
+            )
         
-        required_groups = required_groups.get('groups', None)
+        required_groups = http_method_access_rules.get('groups', None)
 
         # Return True if the user has all the required groups or is staff.
         return self.is_in_required_groups(request.user, required_groups)
@@ -55,17 +57,19 @@ class HasRequiredGroups(permissions.BasePermission):
             # Separate list URL(This will be handled in has_permission)
             return True
 
-        # Get a mapping of methods -> required group.
-        required_groups_mapping = getattr(view, "groups_and_permissions", {})
+        # Get a mapping of methods -> access rules
+        access_rules = getattr(view, "access_rules", {})
 
-        # Determine the required groups for this particular request method.
-        required_groups = required_groups_mapping.get(request.method, {})
+        # Get access rules for this particular request method.
+        http_method_access_rules = access_rules.get(request.method, {})
 
         if view.action == 'retrieve':
-            # Get required groups for retrieve action
-            required_groups = required_groups.get('retrieve', {'groups': None, 'permissions': None})
+            # Get access rules for retrieve action
+            http_method_access_rules = http_method_access_rules.get(
+                view.action, {'groups': None, 'permissions': None}
+            )
 
-        required_groups = required_groups.get('groups', None)
+        required_groups = http_method_access_rules.get('groups', None)
 
         # Return True if the user has all the required groups or is staff.
         return self.is_in_required_groups(request.user, required_groups)
@@ -109,18 +113,19 @@ class HasRequiredPermissions(permissions.BasePermission):
         
     @staticmethod
     def get_permissions(request, view):
-        # Get a mapping of methods -> required group.
-        required_permissions_mapping = getattr(view, "groups_and_permissions", {})
+        # Get a mapping of methods -> access rules
+        access_rules = getattr(view, "access_rules", {})
 
-        # Determine the required groups for this particular request method.
-        required_permissions = required_permissions_mapping.get(request.method, {})
+        # Get access rules for this particular request method.
+        http_method_access_rules = access_rules.get(request.method, {})
 
-        if view.action == 'retrieve':
-            required_permissions = required_permissions.get('retrieve', {'groups': None, 'permissions': None})
-        elif view.action == 'list':
-            required_permissions = required_permissions.get('list', {'groups': None, 'permissions': None})
+        if view.action in ['list', 'retrieve']:
+            # Get access rules for list/retrieve action
+            http_method_access_rules = http_method_access_rules.get(
+                view.action, {'groups': None, 'permissions': None}
+            )
 
-        return required_permissions.get('permissions', None)
+        return http_method_access_rules.get('permissions', None)
 
     def has_permission(self, request, view):
         required_permissions = self.get_permissions(request, view)
