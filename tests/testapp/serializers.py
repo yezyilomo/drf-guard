@@ -8,6 +8,7 @@ ROLE_CHOICES = (
     ('teacher', 'Teacher')
 )
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

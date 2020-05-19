@@ -32,13 +32,13 @@ class Tests(APITestCase):
         url = reverse_lazy("user-list")
         self.client.force_authenticate(user=self.student)
         response = self.client.get(url, format="json")
-        self.assertEqual(response.status_code , 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_list_with_teacher(self):
         url = reverse_lazy("user-list")
         self.client.force_authenticate(user=self.teacher)
         response = self.client.get(url, format="json")
-        self.assertEqual(response.status_code , 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_retrieve_admin_with_admin_ac(self):
         url = reverse_lazy("user-detail", args=[self.admin.id])
@@ -62,10 +62,16 @@ class Tests(APITestCase):
         url = reverse_lazy("user-detail", args=[self.teacher.id])
         self.client.force_authenticate(user=self.student)
         response = self.client.get(url, format="json")
-        self.assertEqual(response.status_code , 403)
+        self.assertEqual(response.status_code, 403)
 
     def test_retrieve_student_with_teacher_ac(self):
         url = reverse_lazy("user-detail", args=[self.student.id])
         self.client.force_authenticate(user=self.teacher)
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, 200)
+
+    def test_delete_student_own_ac(self):
+        url = reverse_lazy("user-detail", args=[self.student.id])
+        self.client.force_authenticate(user=self.student)
+        response = self.client.delete(url, format="json")
+        self.assertEqual(response.status_code, 403)

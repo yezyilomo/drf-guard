@@ -24,11 +24,11 @@ class HasRequiredGroups(permissions.BasePermission):
         if groups is None:
             # Don't check the permissions
             return True
-            
+
         reducer = Reducer()
         return reducer(
-                (cls.is_in_group(user, group) for group in groups)
-            )
+            (cls.is_in_group(user, group) for group in groups)
+        )
 
     def has_permission(self, request, view):
         if view.action == 'retrieve':
@@ -46,7 +46,7 @@ class HasRequiredGroups(permissions.BasePermission):
             http_method_access_rules = http_method_access_rules.get(
                 view.action, {'groups': None, 'permissions': None}
             )
-        
+
         required_groups = http_method_access_rules.get('groups', None)
 
         # Return True if the user has all the required groups or is staff.
@@ -110,7 +110,7 @@ class HasRequiredPermissions(permissions.BasePermission):
             cls.has_required_permission(permission, *args)
             for permission in permissions
         ))
-        
+
     @staticmethod
     def get_permissions(request, view):
         # Get a mapping of methods -> access rules

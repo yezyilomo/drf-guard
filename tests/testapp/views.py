@@ -16,29 +16,29 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (HasRequiredGroups, HasRequiredPermissions)
     http_method_names = ['get', 'put', 'patch', 'delete']
     access_rules = {
-         'GET': {
-             'list': {
-                 'groups': ['admin'],
-                 'permissions': [IsAuthenticated]
-             },
-             'retrieve': {
-                 'groups': ['__all__'],
-                 'permissions': [
-					 IsAuthenticated, And, 
-					 [IsAllowedUser, Or, IsAdminUser, Or, IsTeacherAccessingStudent]
-					]
-             },
-         },
-         'PUT': {
-             'groups': ['__all__'],
-             'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
-         },
-         'PATCH': {
-             'groups': ['__all__'],
-             'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
-         },
-         'DELETE': {
-             'groups': ['__all__'],
-             'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
-         }
+        'GET': {
+            'list': {
+                'groups': ['admin'],
+                'permissions': [IsAuthenticated]
+            },
+            'retrieve': {
+                'groups': ['__all__'],
+                'permissions': [
+                    IsAuthenticated, And,
+                    [IsAllowedUser, Or, IsAdminUser, Or, IsTeacherAccessingStudent]
+                ]
+            },
+        },
+        'PUT': {
+            'groups': ['__all__'],
+            'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
+        },
+        'PATCH': {
+            'groups': ['__all__'],
+            'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
+        },
+        'DELETE': {
+            'groups': [Not, 'student'],
+            'permissions': [IsAuthenticated]
+        }
     }
