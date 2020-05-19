@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-#Auth model
+# Auth model
 AUTH_USER_MODEL = 'testapp.User'
 
 
