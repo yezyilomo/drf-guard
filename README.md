@@ -54,7 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
              },
              'retrieve': {
                  'groups': [Not, 'admin'],  # The user must not be in admin group
-                 'permissions': [IsAuthenticated, And, IsAllowedUser]  # MUst be authenticated and allowed
+                 'permissions': [IsAuthenticated, And, IsAllowedUser]  # Must be authenticated and allowed
              },
          },
 
