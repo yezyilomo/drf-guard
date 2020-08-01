@@ -58,9 +58,14 @@ class UserViewSet(viewsets.ModelViewSet):
              },
          },
 
+         'POST': {
+             'groups': [],  # Don't allow at all(This evaluates to False always)
+             'permissions': []  # Don't allow at all(This evaluates to False always)
+         },
+
          'PUT': {
-             'groups': ['__all__'],  # Belongs to any group
-             'permissions': [IsAuthenticated, And, IsAdmin]  # By now this should be obvious
+             'groups': '__any__',  # Belongs to any group or none
+             'permissions': '__any__'  # Has any permission or none
          },
 
          'PATCH': {
@@ -89,7 +94,7 @@ What's important here is to know what goes into groups and permissions
 ### Note:
 - `And`, `Or` & `Not` are the equvalent operators for `and`, `or` & `not` respectively 
 - Unlike `and`, `or` & `not` the operators `And`, `Or` & `Not` have no precedence they are evaluated from left to right, if you want precedence use list or tuple to make one i.e `[IsAuthenticated, And, [IsAdmin, Or, IsClient]]`
-- The `'__all__'` on groups stands for any group(or allow all groups)
+- The `'__any__'` on groups/permissions stands for any group/permission or none
 - The GET-list stands for permission & groups in `GET: /users/` route
 - The GET-retrieve stands for groups & permissions in `GET: /users/{id}/` routes
 - The POST stands for groups & permissions in `POST: /users/` route

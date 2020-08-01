@@ -10,8 +10,6 @@ class HasRequiredGroups(permissions.BasePermission):
     """
     @classmethod
     def is_in_group(cls, user, group):
-        if group == '__all__':
-            return True
         if isinstance(group, (str, Group)):
             return user.groups.filter(name=group).exists()
         if isinstance(group, (list, tuple)):
@@ -21,35 +19,41 @@ class HasRequiredGroups(permissions.BasePermission):
 
     @classmethod
     def is_in_required_groups(cls, user, groups):
-        if groups is None:
-            # Don't check the permissions
+        if groups == '__any__':
             return True
+        if not groups:
+            # If there are no groups to check
+            return False
 
         reducer = Reducer()
         return reducer(
             (cls.is_in_group(user, group) for group in groups)
         )
 
-    def has_permission(self, request, view):
-        if view.action == 'retrieve':
-            # Separate retrive URL(This will be handled in has_object_permission)
-            return True
-
-        # Get a mapping of methods -> access_rules
+    @staticmethod
+    def get_groups(request, view):
+        # Get a mapping of methods -> access rules
         access_rules = getattr(view, "access_rules", {})
 
         # Get access rules for this particular request method.
         http_method_access_rules = access_rules.get(request.method, {})
 
-        if view.action == 'list':
-            # Get required access rules for list action
+        default_groups = '__any__'
+
+        if view.action in ['list', 'retrieve']:
+            # Get required group related access rules for list action
             http_method_access_rules = http_method_access_rules.get(
-                view.action, {'groups': None, 'permissions': None}
+                view.action, {'groups': default_groups}
             )
 
-        required_groups = http_method_access_rules.get('groups', None)
+        return http_method_access_rules.get('groups', default_groups)
 
-        # Return True if the user has all the required groups or is staff.
+    def has_permission(self, request, view):
+        if view.action == 'retrieve':
+            # Separate retrive URL(This will be handled in has_object_permission)
+            return True
+
+        required_groups = self.get_groups(request, view)
         return self.is_in_required_groups(request.user, required_groups)
 
     def has_object_permission(self, request, view, obj):
@@ -57,21 +61,7 @@ class HasRequiredGroups(permissions.BasePermission):
             # Separate list URL(This will be handled in has_permission)
             return True
 
-        # Get a mapping of methods -> access rules
-        access_rules = getattr(view, "access_rules", {})
-
-        # Get access rules for this particular request method.
-        http_method_access_rules = access_rules.get(request.method, {})
-
-        if view.action == 'retrieve':
-            # Get access rules for retrieve action
-            http_method_access_rules = http_method_access_rules.get(
-                view.action, {'groups': None, 'permissions': None}
-            )
-
-        required_groups = http_method_access_rules.get('groups', None)
-
-        # Return True if the user has all the required groups or is staff.
+        required_groups = self.get_groups(request, view)
         return self.is_in_required_groups(request.user, required_groups)
 
 
@@ -97,13 +87,15 @@ class HasRequiredPermissions(permissions.BasePermission):
             return permission()
         else:
             data_type = type(permission).__name__
-            raise TypeError("`%s` is invalid permission type." % data_type)
+            raise TypeError("`%s` is an invalid permission type." % data_type)
 
     @classmethod
     def has_required_permissions(cls, permissions, *args):
-        if permissions is None:
-            # Don't check the permissions
+        if permissions == '__any__':
             return True
+        if not permissions:
+            # If there are no permissions to check
+            return False
 
         reducer = Reducer()
         return reducer((
@@ -119,13 +111,15 @@ class HasRequiredPermissions(permissions.BasePermission):
         # Get access rules for this particular request method.
         http_method_access_rules = access_rules.get(request.method, {})
 
+        default_permissions = '__any__'
+
         if view.action in ['list', 'retrieve']:
             # Get access rules for list/retrieve action
             http_method_access_rules = http_method_access_rules.get(
-                view.action, {'groups': None, 'permissions': None}
+                view.action, {'permissions': default_permissions}
             )
 
-        return http_method_access_rules.get('permissions', None)
+        return http_method_access_rules.get('permissions', default_permissions)
 
     def has_permission(self, request, view):
         required_permissions = self.get_permissions(request, view)
