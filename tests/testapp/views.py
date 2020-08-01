@@ -5,7 +5,7 @@ from tests.testapp.models import User
 from tests.testapp.serializers import UserSerializer
 
 from drf_guard.operators import And, Or, Not
-from .permissions import IsAdminUser, IsAllowedUser, IsTeacherAccessingStudent
+from .permissions import IsAdminUser, IsSelfUser, IsTeacherAccessingStudent
 from drf_guard.permissions import HasRequiredGroups, HasRequiredPermissions
 
 
@@ -22,20 +22,20 @@ class UserViewSet(viewsets.ModelViewSet):
                 'permissions': [IsAuthenticated]
             },
             'retrieve': {
-                'groups': ['__all__'],
+                'groups': '__any__',
                 'permissions': [
                     IsAuthenticated, And,
-                    [IsAllowedUser, Or, IsAdminUser, Or, IsTeacherAccessingStudent]
+                    [IsSelfUser, Or, IsAdminUser, Or, IsTeacherAccessingStudent]
                 ]
             },
         },
         'PUT': {
-            'groups': ['__all__'],
-            'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
+            'groups': '__any__',
+            'permissions': [IsAuthenticated, [IsSelfUser, Or, IsAdminUser]]
         },
         'PATCH': {
-            'groups': ['__all__'],
-            'permissions': [IsAuthenticated, [IsAllowedUser, Or, IsAdminUser]]
+            'groups': '__any__',
+            'permissions': [IsAuthenticated, [IsSelfUser, Or, IsAdminUser]]
         },
         'DELETE': {
             'groups': [Not, 'student'],
