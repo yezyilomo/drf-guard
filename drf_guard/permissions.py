@@ -128,3 +128,91 @@ class HasRequiredPermissions(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         required_permissions = self.get_permissions(request, view)
         return self.has_required_permissions(required_permissions, request, view, obj)
+
+
+class HasRequiredAccessRules(permissions.BasePermission):
+    """
+    Ensure user is has required permissions and is in required groups.
+    """
+    @classmethod
+    def get_operator_or_operand_value(cls, operator_or_operand, groups_and_perms):
+        if isinstance(operator_or_operand, str):
+            # It's an operand
+            operand = operator_or_operand
+            try:
+                return groups_and_perms[operand]
+            except KeyError:
+                operands = ['`%s`' % op for op in groups_and_perms.keys()]
+                allowed_operands = ', '.join(operands)
+                msg = (
+                    "`%s` is an invalid operand, allowed operands are %s."
+                ) % (operand, allowed_operands)
+                raise TypeError(msg)
+
+        elif isinstance(operator_or_operand, (list, tuple)):
+            # It's sub expr
+            sub_expr = operator_or_operand
+            return cls.eval_groups_and_perms_expr(sub_expr, groups_and_perms)
+
+        elif issubclass(operator_or_operand, Operator):
+            # Encountered an operator
+            operator = operator_or_operand
+            return operator()
+
+        else:
+            # Invalid operand
+            data_type = type(operator_or_operand).__name__
+            operands = ['`%s`' % op for op in groups_and_perms.keys()]
+            allowed_operands = ', '.join(operands)
+            msg = (
+                "`%s` is an invalid operand, allowed operands are %s."
+            ) % (data_type, allowed_operands)
+            raise TypeError(msg)
+
+    @classmethod
+    def eval_groups_and_perms_expr(cls, groups_and_perms_expr, groups_and_perms):
+        reducer = Reducer()
+        return reducer((
+            cls.get_operator_or_operand_value(operator_or_operand, groups_and_perms)
+            for operator_or_operand in groups_and_perms_expr
+        ))
+
+    @staticmethod
+    def get_groups_and_perms_expr(request, view):
+        # Get a mapping of methods -> access rules
+        access_rules = getattr(view, "access_rules", {})
+
+        # Get access rules for this particular request method.
+        http_method_access_rules = access_rules.get(request.method, {})
+
+        default_groups_and_perms_expr = ['groups', 'permissions']
+
+        if view.action in ['list', 'retrieve']:
+            # Get access rules for list/retrieve action
+            http_method_access_rules = http_method_access_rules.get(
+                view.action,
+                {'expression': default_groups_and_perms_expr}
+            )
+
+        return http_method_access_rules.get(
+            'expression',
+            default_groups_and_perms_expr
+        )
+
+    def has_permission(self, request, view):
+        groups_and_perms = {
+            'groups': HasRequiredGroups().has_permission(request, view),
+            'permissions': HasRequiredPermissions().has_permission(request, view)
+        }
+
+        groups_and_perms_expr = self.get_groups_and_perms_expr(request, view)
+        return self.eval_groups_and_perms_expr(groups_and_perms_expr, groups_and_perms)
+
+    def has_object_permission(self, request, view, obj):
+        groups_and_perms = {
+            'groups': HasRequiredGroups().has_object_permission(request, view, obj),
+            'permissions': HasRequiredPermissions().has_object_permission(request, view, obj)
+        }
+
+        groups_and_perms_expr = self.get_groups_and_perms_expr(request, view)
+        return self.eval_groups_and_perms_expr(groups_and_perms_expr, groups_and_perms)
